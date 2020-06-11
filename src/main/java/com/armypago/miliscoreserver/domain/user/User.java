@@ -1,6 +1,7 @@
 package com.armypago.miliscoreserver.domain.user;
 
 import com.armypago.miliscoreserver.domain.BaseTimeEntity;
+import com.armypago.miliscoreserver.domain.branch.Branch;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,17 +36,22 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "education_id")
     private Education education;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+
     // TODO : 인증여부, 입대년도, ...
 
     @Builder
     public User(String name, String email, String major,
-                MilitaryServiceStatus status, Education education){
+                MilitaryServiceStatus status, Education education, Branch branch){
         role = Role.USER;
         this.name = name;
         this.email = email;
         this.major = major;
         this.status = status;
         this.education = education;
+        this.branch = branch;
     }
 
     public void updateInfo(String email, MilitaryServiceStatus status){
