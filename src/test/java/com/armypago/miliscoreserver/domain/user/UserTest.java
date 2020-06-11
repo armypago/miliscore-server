@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -40,7 +42,10 @@ class UserTest {
     }
 
     private Education getEducation(){
-        return educationRepository.save(Education.builder().priority(3).name("대졸").build());
+        Optional<Education> byPriority = educationRepository.findByPriority(3);
+        return byPriority
+                .orElseGet(() -> educationRepository.save(Education.builder()
+                        .priority(3).name("대졸").build()));
     }
 
     private User getUser(Education education, Branch branch){
