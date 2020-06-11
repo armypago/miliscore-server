@@ -31,7 +31,6 @@ public class User extends BaseTimeEntity {
     @Column(name = "military_service_status")
     private MilitaryServiceStatus status;
 
-    @Column(updatable = false)
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "education_id")
     private Education education;

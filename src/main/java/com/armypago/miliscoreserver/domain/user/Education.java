@@ -18,15 +18,15 @@ public class Education {
     private Long id;
 
     @Column(unique = true)
-    private int order;
+    private int priority;
 
     // TODO: 고졸, 대재, 대졸, 휴학, 석재, 석졸
     @Column(nullable = false)
     private String name;
 
     @Builder
-    public Education(int order, String name){
-        this.order = order;
+    public Education(int priority, String name){
+        this.priority = priority;
         this.name = name;
     }
 }
