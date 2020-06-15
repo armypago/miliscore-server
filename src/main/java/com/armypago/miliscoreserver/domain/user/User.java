@@ -58,4 +58,8 @@ public class User extends BaseTimeEntity {
         this.email = email;
         this.status = status;
     }
+
+    public String getRoleKey() {
+        return role.getKey();
+    }
 }
