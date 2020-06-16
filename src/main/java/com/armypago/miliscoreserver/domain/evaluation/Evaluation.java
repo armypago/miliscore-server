@@ -16,6 +16,8 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 public class Evaluation extends BaseTimeEntity {
 
+    // TODO 익명 여부
+    
     @Id @GeneratedValue
     private Long id;
 
