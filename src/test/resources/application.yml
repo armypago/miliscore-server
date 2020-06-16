@@ -3,6 +3,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test
+            client-secret: test
+            scope: email
 
 logging.level:
   org.hibernate.SQL: debug
