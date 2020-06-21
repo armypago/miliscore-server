@@ -32,14 +32,23 @@ public class Evaluation extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
+    @Embedded
+    private RadarChart score;
+
+    // TODO 조회수 기능
+
     @Builder
-    public Evaluation(Branch branch, User author, String content){
+    public Evaluation(Branch branch, User author, String content,
+                      RadarChart score){
         this.branch = branch;
         this.author = author;
         this.content = content;
+        this.score = score;
+        this.branch.addEvaluation(this);
     }
 
-    public void updateInfo(String content){
+    public void updateInfo(String content, RadarChart score){
         this.content = content;
+        this.score = score;
     }
 }

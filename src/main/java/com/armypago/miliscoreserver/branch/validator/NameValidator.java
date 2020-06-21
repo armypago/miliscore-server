@@ -1,7 +1,7 @@
 package com.armypago.miliscoreserver.branch.validator;
 
 import com.armypago.miliscoreserver.branch.BranchRepository;
-import com.armypago.miliscoreserver.branch.dto.BranchDto;
+import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -15,16 +15,16 @@ public class NameValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return NameValidator.class.isAssignableFrom(clazz);
+        return clazz.isAssignableFrom(BranchDetailDto.Request.class);
     }
-
+    
     @Override
     public void validate(Object target, Errors errors) {
-        BranchDto branchDto = (BranchDto) target;
-        boolean existName = branchRepository.findByName(branchDto.getName()).isPresent();
-        if(existName){
+        // TODO validate 제대로 적용안됨 (create, update)
+        BranchDetailDto.Request branchRequestDto = (BranchDetailDto.Request) target;
+        branchRepository.findByName(branchRequestDto.getName()).ifPresent(b->{
             errors.rejectValue("nickname", "wrong.value",
-                    "입력하신 닉네임을 사용할 수 없습니다.");
-        }
+                    "이미 존재하는 병과명입니다.");
+        });
     }
 }
