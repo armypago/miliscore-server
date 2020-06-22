@@ -17,13 +17,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.armypago.miliscoreserver.branch.BranchApi.BRANCH_URL;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +39,7 @@ class BranchApiTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "MANAGER")
     @DisplayName("병과 생성")
     void createBranch() throws Exception {
         BranchDetailDto.Request request = new BranchDetailDto.Request();
@@ -59,7 +57,21 @@ class BranchApiTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    @DisplayName("중복 병과 생성")
+    @DisplayName("병과 생성 - 유저 권한 시도")
+    void createBranchByUser() throws Exception {
+        BranchDetailDto.Request request = new BranchDetailDto.Request();
+        String name = "SW 개발병";
+        request.setName(name);
+
+        mockMvc.perform(post(BRANCH_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @WithMockUser(roles = "MANAGER")
+    @DisplayName("병과 생성 - 중복 이름 병과")
     void createDuplicatedBranch() {
         String name = "SW 개발병";
         branchRepository.save(Branch.builder().name(name).build());
@@ -76,7 +88,7 @@ class BranchApiTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "MANAGER")
     @DisplayName("병과 수정")
     void updateBranch() throws Exception {
         String changeName = "군사과학기술병";
@@ -85,7 +97,7 @@ class BranchApiTest {
         request.setName(changeName);
         String url = BRANCH_URL + "/" + id;
 
-        // TODO 수정 기능 접근 붏가 (Put Method)
+        // TODO 수정 기능 접근 불가 (Put Method)
         mockMvc.perform(put(BRANCH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
@@ -96,7 +108,6 @@ class BranchApiTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
     @DisplayName("전체 병과 조회")
     void readAllBranch() throws Exception {
         branchRepository.saveAll(Stream.of("SW 개발병", "군사 과학 기술병", "CERT")
@@ -116,7 +127,6 @@ class BranchApiTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
     @DisplayName("병과 조회")
     void readBranch() throws Exception {
         String name = "SW 개발병";
