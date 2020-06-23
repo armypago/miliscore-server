@@ -1,5 +1,6 @@
 package com.armypago.miliscoreserver.branch.dto;
 
+import com.armypago.miliscoreserver.branch.validator.UniqueName;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,6 +45,9 @@ public class BranchDetailDto {
     @NoArgsConstructor
     @Getter
     public static class Request {
+
+        @UniqueName
+        @NotNull
         private String name;
 
         public Request(Branch branch){

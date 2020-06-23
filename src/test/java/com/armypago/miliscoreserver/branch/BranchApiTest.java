@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import static com.armypago.miliscoreserver.branch.BranchApi.BRANCH_URL;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,12 +80,11 @@ class BranchApiTest {
         BranchDetailDto.Request request = new BranchDetailDto.Request();
         request.setName(name);
 
-        // TODO error handling : 일단 저장은 됨
-//        assertThatThrownBy(() -> mockMvc.perform(post(BRANCH_URL)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(new ObjectMapper().writeValueAsString(request))))
-//                .isInstanceOf(IllegalArgumentException.class)
-//                .hasMessage("이미 존재하는 병과명입니다.");
+        assertThatThrownBy(
+                () -> mockMvc.perform(post(BRANCH_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request))))
+                .hasCause(new IllegalArgumentException("이미 존재하는 병과명입니다."));
     }
 
     @Test
