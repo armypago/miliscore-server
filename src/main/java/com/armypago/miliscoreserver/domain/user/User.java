@@ -24,11 +24,13 @@ public class User extends BaseTimeEntity {
     @Column(unique = true)
     private String email;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column(updatable = false)
     private String major;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "military_service_status")
     private MilitaryServiceStatus status;
 
@@ -61,5 +63,9 @@ public class User extends BaseTimeEntity {
 
     public String getRoleKey() {
         return role.getKey();
+    }
+
+    public void changeRole(Role role){
+        this.role = role;
     }
 }
