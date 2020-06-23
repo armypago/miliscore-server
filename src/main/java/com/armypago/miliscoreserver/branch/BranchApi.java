@@ -6,9 +6,18 @@ import com.armypago.miliscoreserver.branch.validator.NameValidator;
 import com.armypago.miliscoreserver.config.auth.LoginUser;
 import com.armypago.miliscoreserver.config.auth.dto.SessionUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -35,7 +44,7 @@ public class BranchApi {
     }
     
     @PostMapping
-    public Long create(@LoginUser SessionUser user, @RequestBody BranchDetailDto.Request request){
+    public Long create(@RequestBody BranchDetailDto.Request request){
         // TODO error handling : 일단 저장은 됨
         branchRepository.findByName(request.getName()).ifPresent(b -> {
             throw new IllegalArgumentException("이미 존재하는 병과명입니다.");
@@ -44,7 +53,7 @@ public class BranchApi {
     }
 
     @PutMapping("/{id}")
-    public Long update(@LoginUser SessionUser user, @PathVariable Long id,
+    public Long update(@PathVariable Long id,
                        @RequestBody BranchDetailDto.Request branchRequestDto){
         // TODO error handling : 일단 저장은 됨
         branchRepository.findByName(branchRequestDto.getName()).ifPresent(b -> {
@@ -67,7 +76,7 @@ public class BranchApi {
     }
 
     @DeleteMapping("/{id}")
-    public Long delete(@LoginUser SessionUser user, @PathVariable Long id){
+    public Long delete(@PathVariable Long id){
         branchRepository.deleteById(id);
         return id;
     }

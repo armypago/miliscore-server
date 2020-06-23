@@ -61,6 +61,7 @@ public class UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2U
 
         OAuthAttributes attributes = OAuthAttributes.of(
                 registrationId, userNameAttributeName, oAuth2User.getAttributes());
+
         User user = saveUser(attributes);
         httpSession.setAttribute("user", new SessionUser(user));
 

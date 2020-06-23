@@ -3,6 +3,7 @@ package com.armypago.miliscoreserver.config.auth;
 import com.armypago.miliscoreserver.config.auth.dto.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -29,6 +30,9 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
-        return httpSession.getAttribute("user");
+
+        Object user = httpSession.getAttribute("user");
+        return user != null ? user :
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
