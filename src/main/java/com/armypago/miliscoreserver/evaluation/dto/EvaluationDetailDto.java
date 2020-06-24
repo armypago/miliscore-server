@@ -1,12 +1,12 @@
 package com.armypago.miliscoreserver.evaluation.dto;
 
+import com.armypago.miliscoreserver.config.auth.validator.InconsistentUser;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
 import com.armypago.miliscoreserver.domain.user.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.armypago.miliscoreserver.evaluation.validator.DuplicateAuthor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -40,20 +40,31 @@ public class EvaluationDetailDto {
     @Getter
     public static class Request {
 
+        @DuplicateAuthor
+        private EvaluationKey key;
+
+        @InconsistentUser
         private Long authorId;
+
         private Long branchId;
         private String content;
         private RadarChart score;
 
-        public Request(Branch branch, String content, RadarChart score){
+        public Request(User author, Branch branch, String content, RadarChart score){
+            authorId = author.getId();
             branchId = branch.getId();
+            key = new EvaluationKey(authorId, branchId);
             this.content = content;
             this.score = score;
         }
-        public Request(User author, Branch branch, String content, RadarChart score){
-            this(branch, content, score);
-            authorId = author.getId();
-        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EvaluationKey {
+        private Long authorId;
+        private Long branchId;
     }
 
     @Setter

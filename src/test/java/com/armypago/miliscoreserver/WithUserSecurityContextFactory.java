@@ -11,7 +11,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @RequiredArgsConstructor
 public class WithUserSecurityContextFactory implements
         WithSecurityContextFactory<WithUser> {
@@ -31,7 +33,7 @@ public class WithUserSecurityContextFactory implements
 
     private User createUser(WithUser withUser){
         User user = User.builder()
-                .name(withUser.value())
+                .name(withUser.name())
                 .email(withUser.email())
                 .status(withUser.status()).build();
         if(withUser.roles().length > 0){

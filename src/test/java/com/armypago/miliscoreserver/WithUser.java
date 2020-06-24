@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 @WithSecurityContext(factory = WithUserSecurityContextFactory.class)
 public @interface WithUser {
 
-    String value() default "junyoung";
+    String name() default "junyoung";
 
     String email() default "cupjoo@gmail.com";
 

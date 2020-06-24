@@ -29,10 +29,13 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
     public Object resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
-                                  WebDataBinderFactory binderFactory) throws Exception {
+                                  WebDataBinderFactory binderFactory) {
+        return getSessionUser();
+    }
 
+    public SessionUser getSessionUser(){
         Object user = httpSession.getAttribute("user");
-        return user != null ? user :
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (SessionUser) (user != null ? user :
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 }

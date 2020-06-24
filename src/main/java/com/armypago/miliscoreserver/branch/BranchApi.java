@@ -3,7 +3,9 @@ package com.armypago.miliscoreserver.branch;
 import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
 import com.armypago.miliscoreserver.branch.dto.BranchListDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,26 +23,26 @@ public class BranchApi {
     private final BranchRepository branchRepository;
     private final BranchQueryRepository branchQueryRepository;
 
-    // TODO : APP 용 오류 메시지, ResponseBody or ResponseEntity 형식으로 변경
+    // TODO : APP 용 오류 메시지, ResponseBody or ResponseEntity or ExceptionHandler 형식으로 변경
     // TODO : 조건부 검색 추가
     
     @PostMapping
     public Long create(@Valid @RequestBody BranchDetailDto.Request request,
-                       BindingResult bindingResult) throws IllegalArgumentException {
+                       Errors errors) throws IllegalArgumentException {
 
-        if(bindingResult.hasErrors()){
-            throw new IllegalArgumentException(bindingResult
+        if(errors.hasErrors()){
+            throw new IllegalArgumentException(errors
                     .getAllErrors().get(0).getDefaultMessage());
         }
         return branchRepository.save(request.toEntity()).getId();
     }
 
     @PutMapping("/{id}")
-    public Long update(@PathVariable Long id, BindingResult bindingResult,
-                       @Valid @RequestBody BranchDetailDto.Request branchRequestDto){
-
-        if(bindingResult.hasErrors()){
-            throw new IllegalArgumentException(bindingResult
+    public Long update(@PathVariable Long id,
+                       @Valid @RequestBody BranchDetailDto.Request branchRequestDto,
+                       Errors errors){
+        if(errors.hasErrors()){
+            throw new IllegalArgumentException(errors
                     .getAllErrors().get(0).getDefaultMessage());
         }
         return branchRepository.findById(id).map(branch -> {
