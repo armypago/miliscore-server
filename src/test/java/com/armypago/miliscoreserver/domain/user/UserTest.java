@@ -5,6 +5,7 @@ import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.user.EducationRepository;
 import com.armypago.miliscoreserver.user.UserQueryRepository;
 import com.armypago.miliscoreserver.user.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,12 @@ class UserTest {
     @Autowired UserQueryRepository userQueryRepository;
     @Autowired EducationRepository educationRepository;
     @Autowired BranchRepository branchRepository;
+
+    @AfterEach
+    void tearDown() {
+        userRepository.deleteAll();
+        branchRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("사용자 생성")

@@ -12,7 +12,6 @@ import com.armypago.miliscoreserver.evaluation.dto.EvaluationDetailDto;
 import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdateDto;
 import com.armypago.miliscoreserver.user.EducationRepository;
 import com.armypago.miliscoreserver.user.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,15 +22,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.validation.ConstraintViolationException;
 
 import static com.armypago.miliscoreserver.evaluation.EvaluationApi.EVALUATION_URL;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -52,6 +48,8 @@ class EvaluationApiTest {
     @AfterEach
     void tearDown() {
         evaluationRepository.deleteAll();
+        userRepository.deleteAll();
+        branchRepository.deleteAll();
     }
 
     final String userName = "test";

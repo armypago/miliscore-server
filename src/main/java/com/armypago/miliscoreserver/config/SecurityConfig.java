@@ -14,6 +14,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
     
+    // TODO evaluation 제어 추가 후 API 테스트
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http

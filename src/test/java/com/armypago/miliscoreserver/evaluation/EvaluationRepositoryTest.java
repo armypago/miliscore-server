@@ -7,6 +7,7 @@ import com.armypago.miliscoreserver.domain.user.Education;
 import com.armypago.miliscoreserver.domain.user.MilitaryServiceStatus;
 import com.armypago.miliscoreserver.domain.user.User;
 import com.armypago.miliscoreserver.user.EducationRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ class EvaluationRepositoryTest {
     @Autowired EducationRepository educationRepository;
     @Autowired EvaluationRepository evaluationRepository;
     @Autowired EntityManager em;
+
+    @AfterEach
+    void tearDown() {
+        evaluationRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("평가 생성/조회")

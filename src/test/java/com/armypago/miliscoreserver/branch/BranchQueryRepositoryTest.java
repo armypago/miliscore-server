@@ -10,6 +10,7 @@ import com.armypago.miliscoreserver.domain.user.User;
 import com.armypago.miliscoreserver.evaluation.EvaluationRepository;
 import com.armypago.miliscoreserver.user.EducationRepository;
 import com.armypago.miliscoreserver.user.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,13 @@ class BranchQueryRepositoryTest {
     private Branch branch;
     private final String content = "꼭 지원하세요!";
     private final double avgDayOfLeaves = 50;
+
+    @AfterEach
+    void tearDown() {
+        evaluationRepository.deleteAll();
+        branchRepository.deleteAll();
+        userRepository.deleteAll();
+    }
 
     @BeforeEach
     void before(){
