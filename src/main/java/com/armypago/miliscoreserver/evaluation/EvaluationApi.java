@@ -54,8 +54,16 @@ public class EvaluationApi {
     }
 
     @PutMapping("/{id}")
-    public Long update(@PathVariable Long id){
-        return 0L;
+    public ResponseEntity<?> update(@PathVariable @InconsistentAuthor Long id,
+                       @Valid @RequestBody EvaluationUpdateDto.Request request){
+
+        Optional<EvaluationDetailDto.Response> response = evaluationRepository.findById(id).map(evaluation -> {
+            evaluation.updateInfo(request.getContent(), request.getScore());
+            return new EvaluationDetailDto.Response(evaluation);
+        });
+        return response.isPresent() ?
+                ResponseEntity.status(HttpStatus.OK).body(response) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("평가 정보가 올바르지 않습니다.");
     }
 
     @GetMapping("/{id}")

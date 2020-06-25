@@ -126,6 +126,62 @@ class EvaluationApiTest {
     }
 
     @Test
+    @WithUser(name = userName, email = userEmail, status = MilitaryServiceStatus.SERVING)
+    @DisplayName("평가 수정")
+    void updateEvaluation() throws Exception {
+        Branch branch = getBranch();
+        User user = getUser(branch);
+
+        Evaluation evaluation = Evaluation.builder()
+                .content("개꿀입니다!").score(getScore(new double[]{1,1,1,1,1,60}))
+                .branch(branch).author(user).build();
+        evaluationRepository.save(evaluation);
+
+        String updateContent = "낄낄 난 전역한다!";
+        RadarChart updateScore = getScore(new double[]{5,5,5,5,5,30});
+
+        EvaluationUpdateDto.Request request
+                = new EvaluationUpdateDto.Request(updateContent, updateScore);
+
+        String url = EVALUATION_URL + "/" + evaluation.getId();
+
+        ResultActions result = mockMvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        EvaluationDetailDto.Response response = new ObjectMapper().readValue(
+                result.andReturn().getResponse().getContentAsString(),
+                EvaluationDetailDto.Response.class);
+
+        assertThat(response.getContent()).isEqualTo(updateContent);
+    }
+
+    @Test
+    @WithUser(name = userName+"a", email = userEmail+"b", status = MilitaryServiceStatus.SERVING)
+    @DisplayName("평가 수정 - 작성자 불일치")
+    void updateEvaluationWithInconsistentAuthor() throws Exception {
+        Branch branch = getBranch();
+        User user = getUser(branch);
+
+        Evaluation evaluation = Evaluation.builder()
+                .content("개꿀입니다!").score(getScore(new double[]{1,1,1,1,1,60}))
+                .branch(branch).author(user).build();
+        evaluationRepository.save(evaluation);
+
+        String updateContent = "낄낄 난 전역한다!";
+        RadarChart updateScore = getScore(new double[]{5,5,5,5,5,30});
+
+        EvaluationUpdateDto.Request request
+                = new EvaluationUpdateDto.Request(updateContent, updateScore);
+
+        String url = EVALUATION_URL + "/" + evaluation.getId();
+
+        mockMvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("작성자 정보가 일치하지 않습니다."));
     }
 
     private RadarChart getScore(double[] score){
