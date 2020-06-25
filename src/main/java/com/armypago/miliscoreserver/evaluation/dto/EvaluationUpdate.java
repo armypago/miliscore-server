@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
-public class EvaluationUpdateDto {
+public class EvaluationUpdate {
 
     @Setter
     @NoArgsConstructor

@@ -1,7 +1,7 @@
 package com.armypago.miliscoreserver.branch;
 
-import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
-import com.armypago.miliscoreserver.branch.dto.BranchListDto;
+import com.armypago.miliscoreserver.branch.dto.BranchDetail;
+import com.armypago.miliscoreserver.branch.dto.BranchSimple;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
@@ -57,7 +57,7 @@ class BranchApiTest {
     @WithMockUser(roles = "MANAGER")
     @DisplayName("병과 생성")
     void createBranch() throws Exception {
-        BranchDetailDto.Request request = new BranchDetailDto.Request();
+        BranchDetail.Request request = new BranchDetail.Request();
         String name = "SW 개발병";
         request.setName(name);
 
@@ -66,9 +66,9 @@ class BranchApiTest {
                 .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        BranchDetailDto.Response response = new ObjectMapper().readValue(
+        BranchDetail.Response response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                BranchDetailDto.Response.class);
+                BranchDetail.Response.class);
 
         assertThat(response.getName()).isEqualTo(name);
     }
@@ -77,7 +77,7 @@ class BranchApiTest {
     @WithMockUser(roles = "USER")
     @DisplayName("병과 생성 - 유저 권한 시도")
     void createBranchByUser() throws Exception {
-        BranchDetailDto.Request request = new BranchDetailDto.Request();
+        BranchDetail.Request request = new BranchDetail.Request();
         String name = "SW 개발병";
         request.setName(name);
 
@@ -94,7 +94,7 @@ class BranchApiTest {
         String name = "SW 개발병";
         branchRepository.save(Branch.builder().name(name).build());
 
-        BranchDetailDto.Request request = new BranchDetailDto.Request();
+        BranchDetail.Request request = new BranchDetail.Request();
         request.setName(name);
 
         mockMvc.perform(post(BRANCH_URL)
@@ -111,7 +111,7 @@ class BranchApiTest {
         Branch branch = branchRepository.save(Branch.builder().name("SW 개발병").build());
 
         String changeName = "군사과학기술병";
-        BranchDetailDto.Request request = new BranchDetailDto.Request(changeName);
+        BranchDetail.Request request = new BranchDetail.Request(changeName);
 
         String url = BRANCH_URL + "/" + branch.getId();
         // TODO 수정 기능 접근 불가 (Put Method)
@@ -120,9 +120,9 @@ class BranchApiTest {
                 .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        BranchDetailDto.Response response = new ObjectMapper().readValue(
+        BranchDetail.Response response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                BranchDetailDto.Response.class);
+                BranchDetail.Response.class);
 
         assertThat(response.getName()).isEqualTo(changeName);
     }
@@ -136,9 +136,9 @@ class BranchApiTest {
         ResultActions result = mockMvc.perform(get(BRANCH_URL))
                 .andExpect(status().isOk());
 
-        List<BranchListDto> response = new ObjectMapper().readValue(
+        List<BranchSimple> response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                new TypeReference<List<BranchListDto>>(){});
+                new TypeReference<List<BranchSimple>>(){});
 
         boolean hasBranch = (int) response.stream()
                 .filter(b -> b.getName().equals("SW 개발병")).count() > 0;
@@ -158,9 +158,9 @@ class BranchApiTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        BranchDetailDto.Response response = new ObjectMapper().readValue(
+        BranchDetail.Response response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                BranchDetailDto.Response.class);
+                BranchDetail.Response.class);
 
         assertThat(response.getName()).isEqualTo(name);
     }
@@ -178,9 +178,9 @@ class BranchApiTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        BranchDetailDto.Response response = new ObjectMapper().readValue(
+        BranchDetail.Response response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                BranchDetailDto.Response.class);
+                BranchDetail.Response.class);
 
         assertThat(response.getName()).isEqualTo(name);
         assertThat(response.getEvaluations().size()).isEqualTo(evaluations.size());

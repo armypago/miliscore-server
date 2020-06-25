@@ -1,6 +1,6 @@
 package com.armypago.miliscoreserver.branch;
 
-import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
+import com.armypago.miliscoreserver.branch.dto.BranchDetail;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
 import com.querydsl.core.types.Projections;
@@ -17,7 +17,7 @@ public class BranchQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public BranchDetailDto.Response findById(Long id){
+    public BranchDetail.Response findById(Long id){
         Branch findBranch  = queryFactory.selectFrom(branch)
                 .leftJoin(branch.evaluations, evaluation).fetchJoin()
                 .where(branch.id.eq(id))
@@ -36,6 +36,6 @@ public class BranchQueryRepository {
                 .where(evaluation.branch.id.eq(id))
                 .fetchOne();
 
-        return findBranch != null ? new BranchDetailDto.Response(findBranch, radarChart) : null;
+        return findBranch != null ? new BranchDetail.Response(findBranch, radarChart) : null;
     }
 }

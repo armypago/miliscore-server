@@ -1,12 +1,11 @@
 package com.armypago.miliscoreserver.evaluation;
 
 import com.armypago.miliscoreserver.branch.BranchRepository;
-import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.user.User;
-import com.armypago.miliscoreserver.evaluation.dto.EvaluationDetailDto;
-import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdateDto;
+import com.armypago.miliscoreserver.evaluation.dto.EvaluationDetail;
+import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdate;
 import com.armypago.miliscoreserver.evaluation.validator.InconsistentAuthor;
 import com.armypago.miliscoreserver.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +17,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
+import static com.armypago.miliscoreserver.evaluation.EvaluationApi.*;
 
 @Validated
 @RequiredArgsConstructor
-@RequestMapping(EvaluationApi.EVALUATION_URL)
+@RequestMapping(EVALUATION_URL)
 @RestController
 public class EvaluationApi {
 
@@ -39,8 +37,8 @@ public class EvaluationApi {
     // TODO Pageable
     
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody EvaluationDetailDto.Request request, Errors errors){
-        EvaluationDetailDto.Response response = null;
+    public ResponseEntity<?> create(@Valid @RequestBody EvaluationDetail.Request request, Errors errors){
+        EvaluationDetail.Response response = null;
         Optional<User> user = userRepository.findById(request.getAuthorId());
         Optional<Branch> branch = branchRepository.findById(request.getBranchId());
 
@@ -49,7 +47,7 @@ public class EvaluationApi {
                     .author(user.get()).branch(branch.get())
                     .score(request.getScore()).content(request.getContent())
                     .build());
-            response = new EvaluationDetailDto.Response(evaluation);
+            response = new EvaluationDetail.Response(evaluation);
         }
         return response != null ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
@@ -58,11 +56,11 @@ public class EvaluationApi {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable @InconsistentAuthor Long id,
-                       @Valid @RequestBody EvaluationUpdateDto.Request request){
+                       @Valid @RequestBody EvaluationUpdate.Request request){
 
-        Optional<EvaluationDetailDto.Response> response = evaluationRepository.findById(id).map(evaluation -> {
+        Optional<EvaluationDetail.Response> response = evaluationRepository.findById(id).map(evaluation -> {
             evaluation.updateInfo(request.getContent(), request.getScore());
-            return new EvaluationDetailDto.Response(evaluation);
+            return new EvaluationDetail.Response(evaluation);
         });
         return response.isPresent() ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
@@ -71,8 +69,8 @@ public class EvaluationApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable Long id){
-        EvaluationDetailDto.Response response =
-                new EvaluationDetailDto.Response(evaluationQueryRepository.findById(id));
+        EvaluationDetail.Response response =
+                new EvaluationDetail.Response(evaluationQueryRepository.findById(id));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }

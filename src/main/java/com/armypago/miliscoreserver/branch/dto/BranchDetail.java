@@ -11,12 +11,11 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class BranchDetailDto {
+public class BranchDetail {
 
     // TODO 제약조건 추가
     // TODO LocalDateTime 파싱
@@ -30,14 +29,14 @@ public class BranchDetailDto {
 //        private LocalDateTime modifiedDate;
 
         private RadarChart score;
-        private List<EvaluationListDto> evaluations;
+        private List<EvaluationSimple> evaluations;
 
         public Response(Branch branch, RadarChart score){
             id = branch.getId();
             name = branch.getName();
 //            modifiedDate = branch.getModifiedDate();
             evaluations = branch.getEvaluations().stream()
-                    .map(EvaluationListDto::new).collect(toList());
+                    .map(EvaluationSimple::new).collect(toList());
             this.score = score;
         }
     }
@@ -62,14 +61,14 @@ public class BranchDetailDto {
 
     @Getter
     @RequiredArgsConstructor
-    public static class EvaluationListDto {
+    public static class EvaluationSimple {
 
         private Long id;
 
         @Column(nullable = false)
         private String content;
 
-        public EvaluationListDto(Evaluation evaluation){
+        public EvaluationSimple(Evaluation evaluation){
             id = evaluation.getId();
             content = evaluation.getContent();
         }

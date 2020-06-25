@@ -7,12 +7,12 @@ import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
-public class BranchListDto {
+public class BranchSimple {
 
     private Long id;
     private String name;
 
-    public BranchListDto(Branch branch){
+    public BranchSimple(Branch branch){
         id = branch.getId();
         name = branch.getName();
     }

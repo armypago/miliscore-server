@@ -1,6 +1,6 @@
 package com.armypago.miliscoreserver.branch;
 
-import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
+import com.armypago.miliscoreserver.branch.dto.BranchDetail;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
@@ -54,8 +54,8 @@ class BranchQueryRepositoryTest {
     @Test
     @DisplayName("병과 상세 조회")
     void getBranch(){
-        BranchDetailDto.Response branchResponse = branchQueryRepository.findById(branch.getId());
-        List<BranchDetailDto.EvaluationListDto> evaluations = branchResponse.getEvaluations();
+        BranchDetail.Response branchResponse = branchQueryRepository.findById(branch.getId());
+        List<BranchDetail.EvaluationSimple> evaluations = branchResponse.getEvaluations();
         assertThat(evaluations.size()).isEqualTo(2);
         assertThat(evaluations.stream().anyMatch(e -> e.getContent().equals(content))).isTrue();
         assertThat(branchResponse.getScore().getDayOfLeaves()).isEqualTo(avgDayOfLeaves);

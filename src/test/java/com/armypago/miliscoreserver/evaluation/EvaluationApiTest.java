@@ -2,20 +2,17 @@ package com.armypago.miliscoreserver.evaluation;
 
 import com.armypago.miliscoreserver.WithUser;
 import com.armypago.miliscoreserver.branch.BranchRepository;
-import com.armypago.miliscoreserver.branch.dto.BranchListDto;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
 import com.armypago.miliscoreserver.domain.user.Education;
 import com.armypago.miliscoreserver.domain.user.MilitaryServiceStatus;
 import com.armypago.miliscoreserver.domain.user.User;
-import com.armypago.miliscoreserver.evaluation.dto.EvaluationDetailDto;
-import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdateDto;
+import com.armypago.miliscoreserver.evaluation.dto.EvaluationDetail;
+import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdate;
 import com.armypago.miliscoreserver.user.EducationRepository;
 import com.armypago.miliscoreserver.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
-import jdk.internal.org.objectweb.asm.TypeReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,12 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static com.armypago.miliscoreserver.evaluation.EvaluationApi.EVALUATION_URL;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -73,17 +65,17 @@ class EvaluationApiTest {
         String content = "개꿀입니다!";
         RadarChart score = getScore(new double[]{1,1,1,1,1,60});
 
-        EvaluationDetailDto.Request request
-                = new EvaluationDetailDto.Request(user, branch, content, score);
+        EvaluationDetail.Request request
+                = new EvaluationDetail.Request(user, branch, content, score);
 
         ResultActions result = mockMvc.perform(post(EVALUATION_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        EvaluationDetailDto.Response response = new ObjectMapper().readValue(
+        EvaluationDetail.Response response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                EvaluationDetailDto.Response.class);
+                EvaluationDetail.Response.class);
 
         assertThat(response.getContent()).isEqualTo(content);
     }
@@ -98,8 +90,8 @@ class EvaluationApiTest {
         String content = "개꿀입니다!";
         RadarChart score = getScore(new double[]{1,1,1,1,1,60});
 
-        EvaluationDetailDto.Request request
-                = new EvaluationDetailDto.Request(user, branch, content, score);
+        EvaluationDetail.Request request
+                = new EvaluationDetail.Request(user, branch, content, score);
 
         mockMvc.perform(post(EVALUATION_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -123,8 +115,8 @@ class EvaluationApiTest {
                 .branch(branch).author(user).build();
         evaluationRepository.save(evaluation);
 
-        EvaluationDetailDto.Request request
-                = new EvaluationDetailDto.Request(user, branch, content, score);
+        EvaluationDetail.Request request
+                = new EvaluationDetail.Request(user, branch, content, score);
 
         mockMvc.perform(post(EVALUATION_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -148,8 +140,8 @@ class EvaluationApiTest {
         String updateContent = "낄낄 난 전역한다!";
         RadarChart updateScore = getScore(new double[]{5,5,5,5,5,30});
 
-        EvaluationUpdateDto.Request request
-                = new EvaluationUpdateDto.Request(updateContent, updateScore);
+        EvaluationUpdate.Request request
+                = new EvaluationUpdate.Request(updateContent, updateScore);
 
         String url = EVALUATION_URL + "/" + evaluation.getId();
 
@@ -158,9 +150,9 @@ class EvaluationApiTest {
                 .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        EvaluationDetailDto.Response response = new ObjectMapper().readValue(
+        EvaluationDetail.Response response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                EvaluationDetailDto.Response.class);
+                EvaluationDetail.Response.class);
 
         assertThat(response.getContent()).isEqualTo(updateContent);
     }
@@ -180,8 +172,8 @@ class EvaluationApiTest {
         String updateContent = "낄낄 난 전역한다!";
         RadarChart updateScore = getScore(new double[]{5,5,5,5,5,30});
 
-        EvaluationUpdateDto.Request request
-                = new EvaluationUpdateDto.Request(updateContent, updateScore);
+        EvaluationUpdate.Request request
+                = new EvaluationUpdate.Request(updateContent, updateScore);
 
         String url = EVALUATION_URL + "/" + evaluation.getId();
 
@@ -210,9 +202,9 @@ class EvaluationApiTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        EvaluationDetailDto.Response response = new ObjectMapper().readValue(
+        EvaluationDetail.Response response = new ObjectMapper().readValue(
                 result.andReturn().getResponse().getContentAsString(),
-                EvaluationDetailDto.Response.class);
+                EvaluationDetail.Response.class);
 
         assertThat(response.getAuthor().getId()).isEqualTo(user.getId());
     }
