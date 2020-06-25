@@ -1,6 +1,7 @@
 package com.armypago.miliscoreserver.evaluation;
 
 import com.armypago.miliscoreserver.WithUser;
+import com.armypago.miliscoreserver.branch.BranchRepository;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
@@ -45,6 +46,7 @@ class EvaluationApiTest {
     @Autowired UserRepository userRepository;
     @Autowired EvaluationRepository evaluationRepository;
     @Autowired EducationRepository educationRepository;
+    @Autowired BranchRepository branchRepository;
     @Autowired EntityManager em;
 
     @AfterEach
@@ -195,9 +197,7 @@ class EvaluationApiTest {
     }
 
     private Branch getBranch() {
-        Branch branch = Branch.builder().name("SW개발병").build();
-        em.persist(branch);
-        return branch;
+        return branchRepository.save(Branch.builder().name("SW개발병").build());
     }
 
     private User getUser(Branch branch) {

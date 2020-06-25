@@ -2,8 +2,10 @@ package com.armypago.miliscoreserver.branch;
 
 import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
 import com.armypago.miliscoreserver.branch.dto.BranchListDto;
+import com.armypago.miliscoreserver.domain.branch.Branch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -23,42 +25,48 @@ public class BranchApi {
     private final BranchRepository branchRepository;
     private final BranchQueryRepository branchQueryRepository;
 
-    // TODO : APP 용 오류 메시지, ResponseBody or ResponseEntity or ExceptionHandler 형식으로 변경
     // TODO : 조건부 검색 추가
     
     @PostMapping
-    public Long create(@Valid @RequestBody BranchDetailDto.Request request,
-                       Errors errors) throws IllegalArgumentException {
+    public ResponseEntity<?> create(@Valid @RequestBody BranchDetailDto.Request request, Errors errors) {
 
-        if(errors.hasErrors()){
-            throw new IllegalArgumentException(errors
-                    .getAllErrors().get(0).getDefaultMessage());
+        BranchDetailDto.Response response = null;
+        if(!errors.hasErrors()){
+            Branch branch = branchRepository.save(request.toEntity());
+            response = new BranchDetailDto.Response(branch, null);
         }
-        return branchRepository.save(request.toEntity()).getId();
+        return !errors.hasErrors() ?
+                ResponseEntity.status(HttpStatus.OK).body(response) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(errors.getAllErrors().get(0).getDefaultMessage());
     }
 
     @PutMapping("/{id}")
-    public Long update(@PathVariable Long id,
-                       @Valid @RequestBody BranchDetailDto.Request branchRequestDto,
-                       Errors errors){
-        if(errors.hasErrors()){
-            throw new IllegalArgumentException(errors
-                    .getAllErrors().get(0).getDefaultMessage());
+    public ResponseEntity<?> update(@PathVariable Long id,
+                       @Valid @RequestBody BranchDetailDto.Request branchRequestDto, Errors errors){
+
+        BranchDetailDto.Response response = null;
+        if(!errors.hasErrors()){
+            branchRepository.findById(id).ifPresent(branch -> {
+                branch.changeInfo(branchRequestDto.getName());
+            });
+            response = branchQueryRepository.findById(id);
         }
-        return branchRepository.findById(id).map(branch -> {
-            branch.changeInfo(branchRequestDto.getName());
-            return branch.getId();
-        }).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 병과입니다. id="+id));
+        return !errors.hasErrors() ?
+                ResponseEntity.status(HttpStatus.OK).body(response) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 존재하는 병과명입니다.");
     }
 
     @GetMapping("/{id}")
-    public BranchDetailDto.Response get(@PathVariable Long id){
-        return branchQueryRepository.findById(id);
+    public ResponseEntity<?> get(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(branchQueryRepository.findById(id));
     }
 
     @GetMapping
-    public List<BranchListDto> getList(){
-        return branchRepository.findAll().stream().map(BranchListDto::new).collect(toList());
+    public ResponseEntity<?> getList(){
+        List<BranchListDto> response = branchRepository.findAll().stream().map(BranchListDto::new).collect(toList());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")

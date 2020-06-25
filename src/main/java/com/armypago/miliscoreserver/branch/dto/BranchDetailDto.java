@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 public class BranchDetailDto {
 
     // TODO 제약조건 추가
+    // TODO LocalDateTime 파싱
 
     @Setter
     @NoArgsConstructor
@@ -26,7 +27,7 @@ public class BranchDetailDto {
     public static class Response {
         private Long id;
         private String name;
-        private LocalDateTime modifiedDate;
+//        private LocalDateTime modifiedDate;
 
         private RadarChart score;
         private List<EvaluationListDto> evaluations;
@@ -34,7 +35,7 @@ public class BranchDetailDto {
         public Response(Branch branch, RadarChart score){
             id = branch.getId();
             name = branch.getName();
-            modifiedDate = branch.getModifiedDate();
+//            modifiedDate = branch.getModifiedDate();
             evaluations = branch.getEvaluations().stream()
                     .map(EvaluationListDto::new).collect(toList());
             this.score = score;
@@ -50,8 +51,8 @@ public class BranchDetailDto {
         @NotNull
         private String name;
 
-        public Request(Branch branch){
-            name = branch.getName();
+        public Request(String name){
+            this.name = name;
         }
 
         public Branch toEntity(){
