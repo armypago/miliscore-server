@@ -8,8 +8,6 @@ import com.armypago.miliscoreserver.domain.user.User;
 import com.armypago.miliscoreserver.evaluation.validator.DuplicateAuthor;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 public class EvaluationDetailDto {
 
     // TODO 제약 조건 추가
@@ -22,7 +20,7 @@ public class EvaluationDetailDto {
 
         private Long id;
         private BranchDto branch;
-        private UserDto user;
+        private UserDto author;
         private String content;
         private RadarChart score;
 //        private LocalDateTime modifiedDate;
@@ -30,7 +28,7 @@ public class EvaluationDetailDto {
         public Response(Evaluation evaluation){
             id = evaluation.getId();
             branch = new BranchDto(evaluation.getBranch());
-            user = new UserDto(evaluation.getAuthor());
+            author = new UserDto(evaluation.getAuthor());
             content = evaluation.getContent();
             score = evaluation.getScore();
 //            modifiedDate = evaluation.getModifiedDate();

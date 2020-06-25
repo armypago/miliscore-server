@@ -1,6 +1,7 @@
 package com.armypago.miliscoreserver.evaluation;
 
 import com.armypago.miliscoreserver.branch.BranchRepository;
+import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.user.User;
@@ -20,6 +21,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
+
 @Validated
 @RequiredArgsConstructor
 @RequestMapping(EvaluationApi.EVALUATION_URL)
@@ -28,6 +31,7 @@ public class EvaluationApi {
 
     static final String EVALUATION_URL = "/api/v1/evaluation";
 
+    private final EvaluationQueryRepository evaluationQueryRepository;
     private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
@@ -66,15 +70,11 @@ public class EvaluationApi {
     }
 
     @GetMapping("/{id}")
-    public Object get(@PathVariable Long id){
-
-        return null;
-    }
-
-    @GetMapping
-    public List<Object> getList(){
-
-        return null;
+    public ResponseEntity<?> get(@PathVariable Long id){
+        EvaluationDetailDto.Response response =
+                new EvaluationDetailDto.Response(evaluationQueryRepository.findById(id));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
     }
 
     @DeleteMapping("/{id}")

@@ -2,6 +2,7 @@ package com.armypago.miliscoreserver.evaluation;
 
 import com.armypago.miliscoreserver.WithUser;
 import com.armypago.miliscoreserver.branch.BranchRepository;
+import com.armypago.miliscoreserver.branch.dto.BranchListDto;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
@@ -13,6 +14,8 @@ import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdateDto;
 import com.armypago.miliscoreserver.user.EducationRepository;
 import com.armypago.miliscoreserver.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.org.apache.bcel.internal.generic.RETURN;
+import jdk.internal.org.objectweb.asm.TypeReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,16 +23,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static com.armypago.miliscoreserver.evaluation.EvaluationApi.EVALUATION_URL;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -182,6 +190,31 @@ class EvaluationApiTest {
                 .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("작성자 정보가 일치하지 않습니다."));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    @DisplayName("평가 조회")
+    void readEvaluation() throws Exception {
+        Branch branch = getBranch();
+        User user = getUser(branch);
+
+        Evaluation evaluation = Evaluation.builder()
+                .content("개꿀입니다!").score(getScore(new double[]{1,1,1,1,1,60}))
+                .branch(branch).author(user).build();
+        evaluationRepository.save(evaluation);
+
+        String url = EVALUATION_URL + "/" + evaluation.getId();
+
+        ResultActions result = mockMvc.perform(get(url)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        EvaluationDetailDto.Response response = new ObjectMapper().readValue(
+                result.andReturn().getResponse().getContentAsString(),
+                EvaluationDetailDto.Response.class);
+
+        assertThat(response.getAuthor().getId()).isEqualTo(user.getId());
     }
 
     private RadarChart getScore(double[] score){
