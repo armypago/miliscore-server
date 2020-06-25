@@ -3,6 +3,14 @@ package com.armypago.miliscoreserver.branch;
 import com.armypago.miliscoreserver.branch.dto.BranchDetailDto;
 import com.armypago.miliscoreserver.branch.dto.BranchListDto;
 import com.armypago.miliscoreserver.domain.branch.Branch;
+import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
+import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
+import com.armypago.miliscoreserver.domain.user.Education;
+import com.armypago.miliscoreserver.domain.user.MilitaryServiceStatus;
+import com.armypago.miliscoreserver.domain.user.User;
+import com.armypago.miliscoreserver.evaluation.EvaluationRepository;
+import com.armypago.miliscoreserver.user.EducationRepository;
+import com.armypago.miliscoreserver.user.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -34,9 +42,14 @@ class BranchApiTest {
 
     @Autowired MockMvc mockMvc;
     @Autowired BranchRepository branchRepository;
+    @Autowired EducationRepository educationRepository;
+    @Autowired EvaluationRepository evaluationRepository;
+    @Autowired UserRepository userRepository;
 
     @AfterEach
     void tearDown() {
+        evaluationRepository.deleteAll();
+        userRepository.deleteAll();
         branchRepository.deleteAll();
     }
 
@@ -139,12 +152,10 @@ class BranchApiTest {
     void readBranch() throws Exception {
         String name = "SW 개발병";
         Branch branch = branchRepository.save(Branch.builder().name(name).build());
-        BranchDetailDto.Request request = new BranchDetailDto.Request(branch.getName());
         String url = BRANCH_URL + "/" + branch.getId();
 
         ResultActions result = mockMvc.perform(get(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         BranchDetailDto.Response response = new ObjectMapper().readValue(
@@ -152,5 +163,54 @@ class BranchApiTest {
                 BranchDetailDto.Response.class);
 
         assertThat(response.getName()).isEqualTo(name);
+    }
+
+    @Test
+    @DisplayName("병과 조회 - 평가 존재")
+    void readBranchWithEvaluations() throws Exception {
+        String name = "SW 개발병";
+        Branch branch = branchRepository.save(Branch.builder().name(name).build());
+        List<Evaluation> evaluations = getEvaluations(branch);
+
+        String url = BRANCH_URL + "/" + branch.getId();
+
+        ResultActions result = mockMvc.perform(get(url)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        BranchDetailDto.Response response = new ObjectMapper().readValue(
+                result.andReturn().getResponse().getContentAsString(),
+                BranchDetailDto.Response.class);
+
+        assertThat(response.getName()).isEqualTo(name);
+        assertThat(response.getEvaluations().size()).isEqualTo(evaluations.size());
+    }
+    private RadarChart getScore(double[] score){
+        return RadarChart.builder()
+                .careerRelevance(score[0])
+                .workLifeBalance(score[1])
+                .unitVibe(score[2])
+                .trainingIntensity(score[3])
+                .officer(score[4])
+                .dayOfLeaves(score[5]).build();
+    }
+
+    private List<Evaluation> getEvaluations(Branch branch){
+        List<Evaluation> evaluations = getUsers(branch).stream().map(user ->
+                Evaluation.builder()
+                        .content("개꿀입니다!").score(getScore(new double[]{1, 1, 1, 1, 1, 60}))
+                        .branch(branch).author(user).build()).collect(toList());
+        return evaluationRepository.saveAll(evaluations);
+    }
+
+    private List<User> getUsers(Branch branch){
+        Education education = educationRepository.findByPriority(3)
+                .orElseGet(()->educationRepository.save(Education.builder()
+                        .priority(3).name("대졸").build()));
+        List<User> users = Stream.of("aaa", "bbb", "ccc").map(name ->
+                User.builder().name(name).email(name + "@gmail.com")
+                        .major("software").status(MilitaryServiceStatus.SERVING)
+                        .branch(branch).education(education).build()).collect(toList());
+        return userRepository.saveAll(users);
     }
 }
