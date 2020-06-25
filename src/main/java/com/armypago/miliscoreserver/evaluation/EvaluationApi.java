@@ -1,22 +1,26 @@
 package com.armypago.miliscoreserver.evaluation;
 
 import com.armypago.miliscoreserver.branch.BranchRepository;
-import com.armypago.miliscoreserver.config.auth.LoginUser;
-import com.armypago.miliscoreserver.config.auth.dto.SessionUser;
 import com.armypago.miliscoreserver.domain.branch.Branch;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.user.User;
 import com.armypago.miliscoreserver.evaluation.dto.EvaluationDetailDto;
+import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdateDto;
+import com.armypago.miliscoreserver.evaluation.validator.InconsistentAuthor;
 import com.armypago.miliscoreserver.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import sun.plugin.dom.exception.InvalidStateException;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+@Validated
 @RequiredArgsConstructor
 @RequestMapping(EvaluationApi.EVALUATION_URL)
 @RestController
@@ -28,25 +32,25 @@ public class EvaluationApi {
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
 
-    // TODO 예외 처리
     // TODO Pageable
     
     @PostMapping
-    public Long create(@Valid @RequestBody EvaluationDetailDto.Request request, Errors errors){
-        if(errors.hasErrors()){
-            throw new IllegalArgumentException(errors
-                    .getAllErrors().get(0).getDefaultMessage());
-        }
+    public ResponseEntity<?> create(@Valid @RequestBody EvaluationDetailDto.Request request){
+
+        EvaluationDetailDto.Response response = null;
         Optional<User> user = userRepository.findById(request.getAuthorId());
         Optional<Branch> branch = branchRepository.findById(request.getBranchId());
-        if(!user.isPresent() || !branch.isPresent()){
-            throw new IllegalArgumentException("병과 정보가 올바르지 않습니다.");
+
+        if(user.isPresent() && branch.isPresent()){
+            Evaluation evaluation = evaluationRepository.save(Evaluation.builder()
+                    .author(user.get()).branch(branch.get())
+                    .score(request.getScore()).content(request.getContent())
+                    .build());
+            response = new EvaluationDetailDto.Response(evaluation);
         }
-        Evaluation evaluation = Evaluation.builder()
-                .author(user.get()).branch(branch.get())
-                .score(request.getScore()).content(request.getContent())
-                .build();
-        return evaluationRepository.save(evaluation).getId();
+        return response != null ?
+                ResponseEntity.status(HttpStatus.OK).body(response) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("병과 정보가 올바르지 않습니다.");
     }
 
     @PutMapping("/{id}")
@@ -69,5 +73,12 @@ public class EvaluationApi {
     @DeleteMapping("/{id}")
     public Long delete(@PathVariable Long id){
         return 0L;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Object exception(Exception e) {
+        String[] message = e.getMessage().split(": ");
+        return message[message.length-1];
     }
 }

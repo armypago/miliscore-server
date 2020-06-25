@@ -10,6 +10,9 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class RadarChart {
 
+    // TODO 제약조건 추가
+    // TODO validate test case 추가
+
     private double careerRelevance;     // 경력 연관성
     private double workLifeBalance;     // 워라밸
     private double unitVibe;            // 부대 분위기

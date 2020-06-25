@@ -8,8 +8,10 @@ import com.armypago.miliscoreserver.domain.user.Education;
 import com.armypago.miliscoreserver.domain.user.MilitaryServiceStatus;
 import com.armypago.miliscoreserver.domain.user.User;
 import com.armypago.miliscoreserver.evaluation.dto.EvaluationDetailDto;
+import com.armypago.miliscoreserver.evaluation.dto.EvaluationUpdateDto;
 import com.armypago.miliscoreserver.user.EducationRepository;
 import com.armypago.miliscoreserver.user.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,14 +21,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolationException;
 
 import static com.armypago.miliscoreserver.evaluation.EvaluationApi.EVALUATION_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
@@ -61,19 +68,22 @@ class EvaluationApiTest {
         EvaluationDetailDto.Request request
                 = new EvaluationDetailDto.Request(user, branch, content, score);
 
-        mockMvc.perform(post(EVALUATION_URL)
+        ResultActions result = mockMvc.perform(post(EVALUATION_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        Evaluation evaluation = evaluationRepository.findByBranchId(branch.getId()).get(0);
-        assertThat(evaluation.getContent()).isEqualTo(content);
+        EvaluationDetailDto.Response response = new ObjectMapper().readValue(
+                result.andReturn().getResponse().getContentAsString(),
+                EvaluationDetailDto.Response.class);
+
+        assertThat(response.getContent()).isEqualTo(content);
     }
 
     @Test
     @WithUser(name = userName+"a", email = userEmail+"b", status = MilitaryServiceStatus.SERVING)
     @DisplayName("평가 생성 - 로그인 정보 불일치")
-    void createEvaluationWithInconsistentUser() {
+    void createEvaluationWithInconsistentUser() throws Exception {
         Branch branch = getBranch();
         User user = getUser(branch);
 
@@ -83,17 +93,17 @@ class EvaluationApiTest {
         EvaluationDetailDto.Request request
                 = new EvaluationDetailDto.Request(user, branch, content, score);
 
-        assertThatThrownBy(
-                () -> mockMvc.perform(post(EVALUATION_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request))))
-                .hasCause(new IllegalArgumentException("로그인 정보가 일치하지 않습니다."));
+        mockMvc.perform(post(EVALUATION_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("로그인 정보가 일치하지 않습니다."));
     }
 
     @Test
     @WithUser(name = userName, email = userEmail, status = MilitaryServiceStatus.SERVING)
     @DisplayName("평가 생성 - 평가 2회 이상")
-    void createDuplicateEvaluation() {
+    void createDuplicateEvaluation() throws Exception {
         Branch branch = getBranch();
         User user = getUser(branch);
 
@@ -107,11 +117,15 @@ class EvaluationApiTest {
 
         EvaluationDetailDto.Request request
                 = new EvaluationDetailDto.Request(user, branch, content, score);
-        assertThatThrownBy(
-                () -> mockMvc.perform(post(EVALUATION_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request))))
-                .hasCause(new IllegalArgumentException("이미 평가를 작성한 사용자입니다."));
+
+        mockMvc.perform(post(EVALUATION_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("이미 평가를 작성한 사용자입니다."));
+    }
+
+    @Test
     }
 
     private RadarChart getScore(double[] score){
