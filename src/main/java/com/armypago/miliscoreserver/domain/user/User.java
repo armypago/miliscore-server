@@ -27,22 +27,23 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(updatable = false)
-    private String major;
+    private String major = null;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "military_service_status")
-    private MilitaryServiceStatus status;
+    private MilitaryServiceStatus status = null;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "education_id")
-    private Education education;
+    private Education education = null;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "branch_id")
-    private Branch branch;
+    private Branch branch = null;
 
-    // TODO : 인증여부, 입대년도, ...
+    private boolean authenticated = false;
+
+    // TODO : 입대년도, ...
 
     @Builder
     public User(String name, String email, String major,
@@ -50,14 +51,27 @@ public class User extends BaseTimeEntity {
         role = Role.USER;
         this.name = name;
         this.email = email;
-        this.major = major;
+        initialize(status, education, branch, major);
+    }
+
+    public boolean initialize(MilitaryServiceStatus status, Education education,
+                              Branch branch, String major){
+        if (hasInitialized()) {
+            return false;
+        }
         this.status = status;
         this.education = education;
         this.branch = branch;
+        this.major = major;
+        return true;
     }
 
-    public void updateInfo(String email, MilitaryServiceStatus status){
-        this.email = email;
+    private boolean hasInitialized() {
+        return status != null || education != null ||
+                branch != null || major != null;
+    }
+
+    public void updateStatus(MilitaryServiceStatus status){
         this.status = status;
     }
 
@@ -67,5 +81,9 @@ public class User extends BaseTimeEntity {
 
     public void changeRole(Role role){
         this.role = role;
+    }
+
+    public void authenicate(){
+        authenticated = true;
     }
 }

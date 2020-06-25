@@ -3,6 +3,8 @@ package com.armypago.miliscoreserver.domain.user;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum MilitaryServiceStatus {
@@ -13,4 +15,10 @@ public enum MilitaryServiceStatus {
     
     private final String key;
     private final String name;
+
+    public static MilitaryServiceStatus findByKey(String key){
+        return Arrays.stream(values())
+                .filter(status -> status.getKey().equals(key))
+                .findFirst().orElse(null);
+    }
 }
