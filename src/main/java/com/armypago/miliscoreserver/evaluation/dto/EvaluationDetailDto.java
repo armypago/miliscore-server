@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class EvaluationDetailDto {
 
     // TODO 제약 조건 추가
+    // TODO LocalDateTime 파싱
 
     @Setter
     @NoArgsConstructor
@@ -24,24 +25,23 @@ public class EvaluationDetailDto {
         private UserDto user;
         private String content;
         private RadarChart score;
-        private LocalDateTime modifiedDate;
+//        private LocalDateTime modifiedDate;
 
         public Response(Evaluation evaluation){
+            id = evaluation.getId();
             branch = new BranchDto(evaluation.getBranch());
             user = new UserDto(evaluation.getAuthor());
             content = evaluation.getContent();
             score = evaluation.getScore();
-            modifiedDate = evaluation.getModifiedDate();
+//            modifiedDate = evaluation.getModifiedDate();
         }
     }
 
     @Setter
     @NoArgsConstructor
     @Getter
+    @DuplicateAuthor
     public static class Request {
-
-        @DuplicateAuthor
-        private EvaluationKey key;
 
         @InconsistentUser
         private Long authorId;
@@ -53,18 +53,9 @@ public class EvaluationDetailDto {
         public Request(User author, Branch branch, String content, RadarChart score){
             authorId = author.getId();
             branchId = branch.getId();
-            key = new EvaluationKey(authorId, branchId);
             this.content = content;
             this.score = score;
         }
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class EvaluationKey {
-        private Long authorId;
-        private Long branchId;
     }
 
     @Setter

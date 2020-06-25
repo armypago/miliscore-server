@@ -9,7 +9,7 @@ import javax.validation.ConstraintValidatorContext;
 
 @RequiredArgsConstructor
 public class DuplicateAuthorValidator
-        implements ConstraintValidator<DuplicateAuthor, EvaluationDetailDto.EvaluationKey> {
+        implements ConstraintValidator<DuplicateAuthor, EvaluationDetailDto.Request> {
 
     private final EvaluationRepository evaluationRepository;
 
@@ -17,10 +17,10 @@ public class DuplicateAuthorValidator
     public void initialize(DuplicateAuthor constraintAnnotation) {}
 
     @Override
-    public boolean isValid(EvaluationDetailDto.EvaluationKey key,
+    public boolean isValid(EvaluationDetailDto.Request request,
                            ConstraintValidatorContext context) {
         return !evaluationRepository
-                .findByAuthorIdAndBranchId(key.getAuthorId(), key.getBranchId())
+                .findByAuthorIdAndBranchId(request.getAuthorId(), request.getBranchId())
                 .isPresent();
     }
 }
