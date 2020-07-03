@@ -1,6 +1,6 @@
 package com.armypago.miliscoreserver.branch.dto;
 
-import com.armypago.miliscoreserver.domain.branch.Branch;
+import com.armypago.miliscoreserver.domain.branch.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,13 +8,13 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Setter
-public class BranchSimple {
+public class CategorySimple {
 
     private Long id;
     private String name;
 
-    public BranchSimple(Branch branch){
-        id = branch.getId();
-        name = branch.getName();
+    public CategorySimple(Category category){
+        id = category.getId();
+        name = category.getName();
     }
 }

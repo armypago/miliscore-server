@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -23,6 +20,7 @@ public class CategoryApi {
     static final String CATEGORY_URL = "/api/v1/category";
 
     private final CateogryRepository cateogryRepository;
+    private final CategoryQueryRepository categoryQueryRepository;
 
     // TODO 중복 검사
 
@@ -37,5 +35,16 @@ public class CategoryApi {
                 ResponseEntity.status(HttpStatus.OK).body(response) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(errors.getAllErrors().get(0).getDefaultMessage());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> get(@PathVariable Long id){
+        CategoryDetail.Response response = categoryQueryRepository.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getList(){
+        return ResponseEntity.status(HttpStatus.OK).body(cateogryRepository.findAll());
     }
 }

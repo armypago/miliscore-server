@@ -21,14 +21,14 @@ public class CategoryDetail {
         private Long id;
         private String name;
 //        private LocalDateTime modifiedDate;
-        private List<BranchSimple> branchs = new ArrayList<>();
+        private List<BranchSimple> branches = new ArrayList<>();
 
-        public Response(Category category, List<BranchSimple> branchs){
+        public Response(Category category, List<BranchSimple> branches){
             id = category.getId();
             name = category.getName();
 //            modifiedDate = category.getModifiedDate();
-            if(branchs != null && branchs.isEmpty()){
-                this.branchs = branchs;
+            if(branches != null && !branches.isEmpty()){
+                this.branches = branches;
             }
         }
     }
