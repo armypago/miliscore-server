@@ -8,6 +8,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.FetchType.LAZY;
+
 // TODO toString, EqualsAndHashCode(of = "id")
 @Getter
 @NoArgsConstructor
@@ -20,11 +22,15 @@ public class Branch extends BaseTimeEntity {
     @Column(unique = true)
     private String name;
 
+    @ManyToOne(fetch = LAZY)
+    private Category category;
+
     @OneToMany(mappedBy = "branch")
     private List<Evaluation> evaluations = new ArrayList();
 
     @Builder
-    public Branch(String name){
+    public Branch(Category category, String name){
+        this.category = category;
         this.name = name;
     }
 

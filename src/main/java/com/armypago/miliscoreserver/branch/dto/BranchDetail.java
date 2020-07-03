@@ -2,6 +2,7 @@ package com.armypago.miliscoreserver.branch.dto;
 
 import com.armypago.miliscoreserver.branch.validator.UniqueName;
 import com.armypago.miliscoreserver.domain.branch.Branch;
+import com.armypago.miliscoreserver.domain.branch.Category;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -29,7 +31,8 @@ public class BranchDetail {
 //        private LocalDateTime modifiedDate;
 
         private RadarChart score;
-        private List<EvaluationSimple> evaluations;
+        private CategorySimple category;
+        private List<EvaluationSimple> evaluations = new ArrayList<>();
 
         public Response(Branch branch, RadarChart score){
             id = branch.getId();
@@ -38,6 +41,7 @@ public class BranchDetail {
             evaluations = branch.getEvaluations().stream()
                     .map(EvaluationSimple::new).collect(toList());
             this.score = score;
+            category = new CategorySimple(branch.getCategory());
         }
     }
 
@@ -46,16 +50,15 @@ public class BranchDetail {
     @Getter
     public static class Request {
 
+        private Long categoryId;
+
         @UniqueName
         @NotNull
         private String name;
 
-        public Request(String name){
+        public Request(Long categoryId, String name){
+            this.categoryId = categoryId;
             this.name = name;
-        }
-
-        public Branch toEntity(){
-            return Branch.builder().name(name).build();
         }
     }
 
@@ -71,6 +74,20 @@ public class BranchDetail {
         public EvaluationSimple(Evaluation evaluation){
             id = evaluation.getId();
             content = evaluation.getContent();
+        }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class CategorySimple {
+
+        private Long id;
+
+        private String name;
+
+        public CategorySimple(Category category){
+            id = category.getId();
+            name = category.getName();
         }
     }
 }

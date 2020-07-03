@@ -3,6 +3,7 @@ package com.armypago.miliscoreserver.branch;
 import com.armypago.miliscoreserver.branch.dto.BranchDetail;
 import com.armypago.miliscoreserver.branch.dto.BranchSimple;
 import com.armypago.miliscoreserver.domain.branch.Branch;
+import com.armypago.miliscoreserver.domain.branch.Category;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
 import com.armypago.miliscoreserver.domain.user.Education;
@@ -41,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BranchApiTest {
 
     @Autowired MockMvc mockMvc;
+    @Autowired CateogryRepository cateogryRepository;
     @Autowired BranchRepository branchRepository;
     @Autowired EducationRepository educationRepository;
     @Autowired EvaluationRepository evaluationRepository;
@@ -51,15 +53,16 @@ class BranchApiTest {
         evaluationRepository.deleteAll();
         userRepository.deleteAll();
         branchRepository.deleteAll();
+        cateogryRepository.deleteAll();
     }
 
     @Test
     @WithMockUser(roles = "MANAGER")
     @DisplayName("병과 생성")
     void createBranch() throws Exception {
-        BranchDetail.Request request = new BranchDetail.Request();
         String name = "SW 개발병";
-        request.setName(name);
+        Category category = getCategory();
+        BranchDetail.Request request = new BranchDetail.Request(category.getId(), name);
 
         ResultActions result = mockMvc.perform(post(BRANCH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -77,9 +80,9 @@ class BranchApiTest {
     @WithMockUser(roles = "USER")
     @DisplayName("병과 생성 - 유저 권한 시도")
     void createBranchByUser() throws Exception {
-        BranchDetail.Request request = new BranchDetail.Request();
         String name = "SW 개발병";
-        request.setName(name);
+        Category category = getCategory();
+        BranchDetail.Request request = new BranchDetail.Request(category.getId(), name);
 
         mockMvc.perform(post(BRANCH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -92,10 +95,10 @@ class BranchApiTest {
     @DisplayName("병과 생성 - 중복 이름 병과")
     void createDuplicatedBranch() throws Exception {
         String name = "SW 개발병";
-        branchRepository.save(Branch.builder().name(name).build());
+        Category category = getCategory();
+        branchRepository.save(Branch.builder().name(name).category(category).build());
 
-        BranchDetail.Request request = new BranchDetail.Request();
-        request.setName(name);
+        BranchDetail.Request request = new BranchDetail.Request(category.getId(), name);
 
         mockMvc.perform(post(BRANCH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -108,10 +111,12 @@ class BranchApiTest {
     @WithMockUser(roles = "MANAGER")
     @DisplayName("병과 수정")
     void updateBranch() throws Exception {
-        Branch branch = branchRepository.save(Branch.builder().name("SW 개발병").build());
+        Category category = getCategory();
+        Branch branch = branchRepository.save(Branch.builder()
+                .name("SW 개발병").category(category).build());
 
         String changeName = "군사과학기술병";
-        BranchDetail.Request request = new BranchDetail.Request(changeName);
+        BranchDetail.Request request = new BranchDetail.Request(category.getId(), changeName);
 
         String url = BRANCH_URL + "/" + branch.getId();
         // TODO 수정 기능 접근 불가 (Put Method)
@@ -130,8 +135,10 @@ class BranchApiTest {
     @Test
     @DisplayName("전체 병과 조회")
     void readAllBranch() throws Exception {
+        Category category = getCategory();
         branchRepository.saveAll(Stream.of("SW 개발병", "군사 과학 기술병", "CERT")
-                .map(Branch::new).collect(toList()));
+                .map(name -> Branch.builder().name(name).category(category).build())
+                .collect(toList()));
 
         ResultActions result = mockMvc.perform(get(BRANCH_URL))
                 .andExpect(status().isOk());
@@ -151,7 +158,9 @@ class BranchApiTest {
     @DisplayName("병과 조회")
     void readBranch() throws Exception {
         String name = "SW 개발병";
-        Branch branch = branchRepository.save(Branch.builder().name(name).build());
+        Category category = getCategory();
+        Branch branch = branchRepository.save(Branch.builder()
+                .name(name).category(category).build());
         String url = BRANCH_URL + "/" + branch.getId();
 
         ResultActions result = mockMvc.perform(get(url)
@@ -169,7 +178,9 @@ class BranchApiTest {
     @DisplayName("병과 조회 - 평가 존재")
     void readBranchWithEvaluations() throws Exception {
         String name = "SW 개발병";
-        Branch branch = branchRepository.save(Branch.builder().name(name).build());
+        Category category = getCategory();
+        Branch branch = branchRepository.save(Branch.builder()
+                .name(name).category(category).build());
         List<Evaluation> evaluations = getEvaluations(branch);
 
         String url = BRANCH_URL + "/" + branch.getId();
@@ -212,5 +223,9 @@ class BranchApiTest {
                         .major("software").status(MilitaryServiceStatus.SERVING)
                         .branch(branch).education(education).build()).collect(toList());
         return userRepository.saveAll(users);
+    }
+
+    private Category getCategory(){
+        return cateogryRepository.save(Category.builder().name("정보통신").build());
     }
 }

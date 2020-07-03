@@ -23,6 +23,7 @@ public class BranchApi {
     static final String BRANCH_URL = "/api/v1/branch";
 
     private final BranchRepository branchRepository;
+    private final BranchService branchService;
     private final BranchQueryRepository branchQueryRepository;
 
     // TODO : 조건부 검색 추가
@@ -32,10 +33,9 @@ public class BranchApi {
 
         BranchDetail.Response response = null;
         if(!errors.hasErrors()){
-            Branch branch = branchRepository.save(request.toEntity());
-            response = new BranchDetail.Response(branch, null);
+            response = branchService.createBrunch(request.getCategoryId(), request.getName());
         }
-        return !errors.hasErrors() ?
+        return response != null ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(errors.getAllErrors().get(0).getDefaultMessage());
