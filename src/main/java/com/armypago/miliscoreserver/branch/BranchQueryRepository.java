@@ -2,6 +2,7 @@ package com.armypago.miliscoreserver.branch;
 
 import com.armypago.miliscoreserver.branch.dto.BranchDetail;
 import com.armypago.miliscoreserver.domain.branch.Branch;
+import com.armypago.miliscoreserver.domain.branch.QCategory;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import static com.armypago.miliscoreserver.domain.branch.QBranch.*;
+import static com.armypago.miliscoreserver.domain.branch.QCategory.category;
 import static com.armypago.miliscoreserver.domain.evaluation.QEvaluation.*;
 
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class BranchQueryRepository {
     public BranchDetail.Response findById(Long id){
         Branch findBranch  = queryFactory.selectFrom(branch)
                 .leftJoin(branch.evaluations, evaluation).fetchJoin()
+                .leftJoin(branch.category, category).fetchJoin()
                 .where(branch.id.eq(id))
                 .distinct()
                 .fetchOne();

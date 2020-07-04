@@ -2,6 +2,7 @@ package com.armypago.miliscoreserver.branch;
 
 import com.armypago.miliscoreserver.branch.dto.BranchDetail;
 import com.armypago.miliscoreserver.domain.branch.Branch;
+import com.armypago.miliscoreserver.domain.branch.Category;
 import com.armypago.miliscoreserver.domain.evaluation.Evaluation;
 import com.armypago.miliscoreserver.domain.evaluation.RadarChart;
 import com.armypago.miliscoreserver.domain.user.Education;
@@ -31,6 +32,7 @@ class BranchQueryRepositoryTest {
     @Autowired EvaluationRepository evaluationRepository;
     @Autowired UserRepository userRepository;
     @Autowired EducationRepository educationRepository;
+    @Autowired CateogryRepository cateogryRepository;
 
     private Branch branch;
     private final String content = "꼭 지원하세요!";
@@ -41,11 +43,13 @@ class BranchQueryRepositoryTest {
         evaluationRepository.deleteAll();
         branchRepository.deleteAll();
         userRepository.deleteAll();
+        cateogryRepository.deleteAll();
     }
 
     @BeforeEach
     void before(){
-        branch = branchRepository.save(Branch.builder().name("SW 개발병").build());
+        Category category = cateogryRepository.save(Category.builder().name("정보통신").build());
+        branch = branchRepository.save(Branch.builder().name("SW 개발병").category(category).build());
         User user = getUser(branch);
         getEvaluation(branch, user, getScore(new double[]{1, 2, 3, 4, 5, avgDayOfLeaves+10}));
         getEvaluation(branch, user, getScore(new double[]{3, 4, 5, 6, 7, avgDayOfLeaves-10}));
