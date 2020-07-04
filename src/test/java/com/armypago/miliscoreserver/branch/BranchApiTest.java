@@ -219,7 +219,8 @@ class BranchApiTest {
                 .orElseGet(()->educationRepository.save(Education.builder()
                         .priority(3).name("대졸").build()));
         List<User> users = Stream.of("aaa", "bbb", "ccc").map(name ->
-                User.builder().name(name).email(name + "@gmail.com")
+                User.builder()
+                        .name(name).email(name + "@gmail.com")
                         .major("software").status(MilitaryServiceStatus.SERVING)
                         .branch(branch).education(education).build()).collect(toList());
         return userRepository.saveAll(users);

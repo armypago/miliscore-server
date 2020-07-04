@@ -21,6 +21,10 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
 
+    @Lob
+    @Column(unique = true)
+    private String token;
+
     @Column(unique = true)
     private String email;
 
@@ -45,20 +49,28 @@ public class User extends BaseTimeEntity {
 
     // TODO : 입대년도, ...
 
+//    @Builder
+//    public User(String name, String email, String major,
+//                MilitaryServiceStatus status, Education education, Branch branch){
+//        role = Role.USER;
+//        this.name = name;
+//        this.email = email;
+//        initialize(status, education, branch, major);
+//    }
+
     @Builder
-    public User(String name, String email, String major,
-                MilitaryServiceStatus status, Education education, Branch branch){
+    public User(String token){
+        this.token = token;
         role = Role.USER;
-        this.name = name;
-        this.email = email;
-        initialize(status, education, branch, major);
     }
 
-    public boolean initialize(MilitaryServiceStatus status, Education education,
-                              Branch branch, String major){
+    public boolean initialize(String name, String email, MilitaryServiceStatus status,
+                              Education education, Branch branch, String major){
         if (hasInitialized()) {
             return false;
         }
+        this.name = name;
+        this.email = email;
         this.status = status;
         this.education = education;
         this.branch = branch;
@@ -66,8 +78,9 @@ public class User extends BaseTimeEntity {
         return true;
     }
 
-    private boolean hasInitialized() {
-        return status != null || education != null ||
+    public boolean hasInitialized() {
+        return email != null || name != null ||
+                status != null || education != null ||
                 branch != null || major != null;
     }
 

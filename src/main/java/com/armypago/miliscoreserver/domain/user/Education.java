@@ -20,13 +20,16 @@ public class Education {
     @Column(unique = true)
     private int priority;
 
+    private String serialNumber;
+
     // TODO: 고졸, 대재, 대졸, 휴학, 석재, 석졸
     @Column(nullable = false)
     private String name;
 
     @Builder
-    public Education(int priority, String name){
+    public Education(int priority, String name, String serialNumber){
         this.priority = priority;
         this.name = name;
+        this.serialNumber = serialNumber;
     }
 }
