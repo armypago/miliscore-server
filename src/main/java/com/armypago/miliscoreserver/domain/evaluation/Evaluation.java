@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class Evaluation extends BaseTimeEntity {
 
     // TODO 익명 여부
     
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy= IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = LAZY)
@@ -32,6 +33,8 @@ public class Evaluation extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
+    private String description;
+
     @Embedded
     private RadarChart score;
 
@@ -39,16 +42,18 @@ public class Evaluation extends BaseTimeEntity {
 
     @Builder
     public Evaluation(Branch branch, User author, String content,
-                      RadarChart score){
+                      RadarChart score, String description){
         this.branch = branch;
         this.author = author;
         this.content = content;
         this.score = score;
+        this.description = description;
         this.branch.addEvaluation(this);
     }
 
-    public void updateInfo(String content, RadarChart score){
+    public void updateInfo(String content, RadarChart score, String description){
         this.content = content;
         this.score = score;
+        this.description = description;
     }
 }

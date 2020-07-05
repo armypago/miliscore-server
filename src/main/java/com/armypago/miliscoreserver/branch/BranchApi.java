@@ -33,7 +33,7 @@ public class BranchApi {
 
         BranchDetail.Response response = null;
         if(!errors.hasErrors()){
-            response = branchService.createBrunch(request.getCategoryId(), request.getName());
+            response = branchService.createBrunch(request.getCategoryId(), request.getName(), request.getDescription());
         }
         return response != null ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
@@ -48,7 +48,7 @@ public class BranchApi {
         BranchDetail.Response response = null;
         if(!errors.hasErrors()){
             branchRepository.findById(id).ifPresent(branch -> {
-                branch.changeInfo(branchRequestDto.getName());
+                branch.changeInfo(branchRequestDto.getName(), branchRequestDto.getDescription());
             });
             response = branchQueryRepository.findById(id);
         }

@@ -33,22 +33,13 @@ public class EvaluationApi {
     private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
+    private final EvaluationService evaluationService;
 
     // TODO Pageable
     
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody EvaluationDetail.Request request, Errors errors){
-        EvaluationDetail.Response response = null;
-        Optional<User> user = userRepository.findById(request.getAuthorId());
-        Optional<Branch> branch = branchRepository.findById(request.getBranchId());
-
-        if(user.isPresent() && branch.isPresent()){
-            Evaluation evaluation = evaluationRepository.save(Evaluation.builder()
-                    .author(user.get()).branch(branch.get())
-                    .score(request.getScore()).content(request.getContent())
-                    .build());
-            response = new EvaluationDetail.Response(evaluation);
-        }
+        EvaluationDetail.Response response = evaluationService.create(request);
         return response != null ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("병과 정보가 올바르지 않습니다.");
@@ -59,8 +50,8 @@ public class EvaluationApi {
                        @Valid @RequestBody EvaluationUpdate.Request request){
 
         Optional<EvaluationDetail.Response> response = evaluationRepository.findById(id).map(evaluation -> {
-            evaluation.updateInfo(request.getContent(), request.getScore());
-            return new EvaluationDetail.Response(evaluation);
+            evaluation.updateInfo(request.getContent(), request.getScore(), request.getDescription());
+            return new EvaluationDetail.Response(evaluation, null);
         });
         return response.isPresent() ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
@@ -69,8 +60,7 @@ public class EvaluationApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable Long id){
-        EvaluationDetail.Response response =
-                new EvaluationDetail.Response(evaluationQueryRepository.findById(id));
+        EvaluationDetail.Response response = evaluationQueryRepository.findById(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }

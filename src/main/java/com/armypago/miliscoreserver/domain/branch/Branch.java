@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
 
 // TODO toString, EqualsAndHashCode(of = "id")
 @Getter
@@ -16,7 +17,7 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 public class Branch extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy= IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -28,14 +29,18 @@ public class Branch extends BaseTimeEntity {
     @OneToMany(mappedBy = "branch")
     private List<Evaluation> evaluations = new ArrayList();
 
+    private String description;
+
     @Builder
-    public Branch(Category category, String name){
+    public Branch(Category category, String name, String description){
         this.category = category;
         this.name = name;
+        this.description = description;
     }
 
-    public void changeInfo(String name){
+    public void changeInfo(String name, String description){
         this.name = name;
+        this.description = description;
     }
 
     // TODO remove eval

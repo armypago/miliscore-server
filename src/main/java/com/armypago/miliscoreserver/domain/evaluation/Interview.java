@@ -1,7 +1,5 @@
 package com.armypago.miliscoreserver.domain.evaluation;
 
-import com.armypago.miliscoreserver.domain.BaseTimeEntity;
-import com.armypago.miliscoreserver.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +12,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Comment extends BaseTimeEntity {
+public class Interview {
 
     @Id @GeneratedValue(strategy= IDENTITY)
     private Long id;
@@ -23,21 +21,14 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "evaluation_id")
     private Evaluation evaluation;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User author;
+    private String question;
 
-    @Column(nullable = false)
-    private String content;
+    private String answer;
 
     @Builder
-    public Comment(Evaluation evaluation, User author, String content){
+    public Interview(Evaluation evaluation, String question, String answer){
         this.evaluation = evaluation;
-        this.author = author;
-        this.content = content;
-    }
-
-    public void changeContent(String content){
-        this.content = content;
+        this.question = question;
+        this.answer = answer;
     }
 }

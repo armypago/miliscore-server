@@ -19,7 +19,7 @@ public class UserCreate {
     @AllArgsConstructor
     @Getter
     public static class Form {
-        private Long userId;
+        private Long id;
         private List<String> status;
         private List<EducationSimple> education;
         private List<BranchSimple> branch;
@@ -47,6 +47,8 @@ public class UserCreate {
         @NotNull
         private String name;
 
+        private String serialNumber;
+
         @NotNull
         private String statusName;
 
@@ -59,11 +61,12 @@ public class UserCreate {
         private String major;
 
         public Request(String name, MilitaryServiceStatus status, Education education,
-                       Branch branch, String major){
+                       Branch branch, String major, String serialNumber){
             this.name = name;
             statusName = status.getName();
             educationId = education.getId();
             branchId = branch.getId();
+            this.serialNumber = serialNumber;
             this.major = major;
         }
         public MilitaryServiceStatus getStatus(){

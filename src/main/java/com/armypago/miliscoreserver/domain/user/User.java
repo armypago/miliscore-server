@@ -9,13 +9,14 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Getter
 @NoArgsConstructor
 @Entity
 public class User extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy= IDENTITY)
     private Long id;
 
     private String name = null;
@@ -36,13 +37,14 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "education_id")
     private Education education = null;
 
+    private String serialNumber = null;
+    // TODO unique 조건 조금 비교
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "branch_id")
     private Branch branch = null;
 
     private boolean authenticated = false;
-
-    // TODO : 입대년도, ...
 
 //    @Builder
 //    public User(String name, String email, String major,
@@ -59,7 +61,7 @@ public class User extends BaseTimeEntity {
         role = Role.USER;
     }
 
-    public boolean initialize(String name, MilitaryServiceStatus status,
+    public boolean initialize(String name, MilitaryServiceStatus status, String serialNumber,
                               Education education, Branch branch, String major){
         if (hasInitialized()) {
             return false;
@@ -67,13 +69,14 @@ public class User extends BaseTimeEntity {
         this.name = name;
         this.status = status;
         this.education = education;
+        this.serialNumber = serialNumber;
         this.branch = branch;
         this.major = major;
         return true;
     }
 
     public boolean hasInitialized() {
-        return name != null ||
+        return name != null || serialNumber != null ||
                 status != null || education != null ||
                 branch != null || major != null;
     }

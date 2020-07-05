@@ -56,9 +56,12 @@ public class BranchDetail {
         @NotNull
         private String name;
 
-        public Request(Long categoryId, String name){
+        private String description;
+
+        public Request(Long categoryId, String name, String description){
             this.categoryId = categoryId;
             this.name = name;
+            this.description = description;
         }
     }
 

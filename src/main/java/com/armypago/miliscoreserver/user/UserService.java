@@ -29,7 +29,7 @@ public class UserService {
         Optional<Branch> branch = branchRepository.findById(request.getBranchId());
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         if(education.isPresent() && branch.isPresent()){
-            user.initialize(request.getName(), request.getStatus(),
+            user.initialize(request.getName(), request.getStatus(), request.getSerialNumber(),
                     education.get(), branch.get(), request.getMajor());
         }
         return user;
@@ -37,7 +37,7 @@ public class UserService {
 
     public UserCreate.Form loadForm(Long userId){
         UserCreate.Form form = new UserCreate.Form();
-        form.setUserId(userId);
+        form.setId(userId);
         form.setStatus(MilitaryServiceStatus.getList());
         form.setEducation(educationRepository.findAll().stream()
                 .map(UserCreate.EducationSimple::new).collect(toList()));

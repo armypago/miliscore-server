@@ -17,10 +17,12 @@ public class EvaluationUpdate {
         @NotNull
         private String content;
         private RadarChart score;
+        private String description;
 
-        public Request(String content, RadarChart score){
+        public Request(String content, RadarChart score, String description){
             this.content = content;
             this.score = score;
+            this.description = description;
         }
     }
 }

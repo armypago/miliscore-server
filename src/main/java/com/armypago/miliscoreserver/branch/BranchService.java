@@ -15,12 +15,13 @@ public class BranchService {
     private final CateogryRepository cateogryRepository;
     private final BranchRepository branchRepository;
 
-    public BranchDetail.Response createBrunch(Long categoryId, String name){
+    public BranchDetail.Response createBrunch(Long categoryId, String name, String description){
         Optional<Category> category = cateogryRepository.findById(categoryId);
         if(!category.isPresent()){
             return null;
         }
-        Branch branch = Branch.builder().category(category.get()).name(name).build();
+        Branch branch = Branch.builder()
+                .category(category.get()).name(name).description(description).build();
         return new BranchDetail.Response(branchRepository.save(branch), null);
     }
 }

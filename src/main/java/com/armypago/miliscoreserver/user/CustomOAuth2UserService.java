@@ -41,17 +41,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final HttpSession httpSession;
 
     // TODO: Spring Batch로 데이터 초기화 방식 변경
-    @Profile("local")
-    @PostConstruct
-    private void initEducationData(){
-        if(educationRepository.count() == 0){
-            AtomicInteger idx = new AtomicInteger(1);
-            List<Education> educations = Stream.of("고졸", "대재", "대졸", "휴학", "석재", "석졸")
-                    .map(s -> Education.builder().priority(idx.getAndIncrement()).name(s).build())
-                    .collect(toList());
-            educationRepository.saveAll(educations);
-        }
-    }
 
     // TODO 계정 생성 화면
 
