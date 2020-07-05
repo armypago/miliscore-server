@@ -228,9 +228,10 @@ class EvaluationApiTest {
                 .orElseGet(()->educationRepository.save(Education.builder()
                         .priority(3).name("대졸").build()));
         User user = User.builder()
-                .name(userName).email(userEmail)
-                .major("software").status(MilitaryServiceStatus.SERVING)
-                .branch(branch).education(education).build();
+//                .name(userName).email(userEmail)
+//                .major("software").status(MilitaryServiceStatus.SERVING)
+//                .branch(branch).education(education)
+                .build();
         return userRepository.findByEmail(user.getEmail())
                 .orElseGet(()->userRepository.save(user));
     }

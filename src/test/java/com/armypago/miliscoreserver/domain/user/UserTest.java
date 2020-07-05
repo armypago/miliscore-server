@@ -57,8 +57,9 @@ class UserTest {
 
     private User getUser(Education education, Branch branch){
         return User.builder()
-                .name("junyoung").email("cupjoo@gmail.com")
-                .major("software").status(MilitaryServiceStatus.SERVING)
-                .branch(branch).education(education).build();
+//                .name("junyoung").email("cupjoo@gmail.com")
+//                .major("software").status(MilitaryServiceStatus.SERVING)
+//                .branch(branch).education(education)
+                .build();
     }
 }

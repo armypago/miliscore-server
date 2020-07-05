@@ -73,9 +73,10 @@ class EvaluationRepositoryTest {
                 .orElseGet(()->educationRepository.save(Education.builder()
                         .priority(3).name("대졸").build()));
         User user = User.builder()
-                .name("junyoung").email("cupjoo@gmail.com")
-                .major("software").status(MilitaryServiceStatus.SERVING)
-                .branch(branch).education(education).build();
+//                .name("junyoung").email("cupjoo@gmail.com")
+//                .major("software").status(MilitaryServiceStatus.SERVING)
+//                .branch(branch).education(education)
+                .build();
         em.persist(user);
         return user;
     }

@@ -85,8 +85,9 @@ class BranchQueryRepositoryTest {
                 .orElseGet(()->educationRepository.save(Education.builder()
                         .priority(3).name("대졸").build()));
         return userRepository.save(User.builder()
-                .education(education).branch(branch)
-                .status(MilitaryServiceStatus.SERVING)
-                .name("Junyoung").major("Software").email("cupjoo@gmail.com").build());
+//                .education(education).branch(branch)
+//                .status(MilitaryServiceStatus.SERVING)
+//                .name("Junyoung").major("Software").email("cupjoo@gmail.com")
+                .build());
     }
 }

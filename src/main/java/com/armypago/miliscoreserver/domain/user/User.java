@@ -18,12 +18,7 @@ public class User extends BaseTimeEntity {
     @Id @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Lob
-    @Column(unique = true)
-    private String token;
+    private String name = null;
 
     @Column(unique = true)
     private String email;
@@ -59,18 +54,17 @@ public class User extends BaseTimeEntity {
 //    }
 
     @Builder
-    public User(String token){
-        this.token = token;
+    public User(String email){
+        this.email = email;
         role = Role.USER;
     }
 
-    public boolean initialize(String name, String email, MilitaryServiceStatus status,
+    public boolean initialize(String name, MilitaryServiceStatus status,
                               Education education, Branch branch, String major){
         if (hasInitialized()) {
             return false;
         }
         this.name = name;
-        this.email = email;
         this.status = status;
         this.education = education;
         this.branch = branch;
@@ -79,7 +73,7 @@ public class User extends BaseTimeEntity {
     }
 
     public boolean hasInitialized() {
-        return email != null || name != null ||
+        return name != null ||
                 status != null || education != null ||
                 branch != null || major != null;
     }

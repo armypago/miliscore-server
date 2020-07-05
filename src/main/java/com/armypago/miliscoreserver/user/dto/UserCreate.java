@@ -48,9 +48,6 @@ public class UserCreate {
         private String name;
 
         @NotNull
-        private String email;
-
-        @NotNull
         private String statusName;
 
         @NotNull
@@ -61,10 +58,9 @@ public class UserCreate {
 
         private String major;
 
-        public Request(String name, String email, MilitaryServiceStatus status, Education education,
+        public Request(String name, MilitaryServiceStatus status, Education education,
                        Branch branch, String major){
             this.name = name;
-            this.email = email;
             statusName = status.getName();
             educationId = education.getId();
             branchId = branch.getId();
@@ -73,17 +69,9 @@ public class UserCreate {
         public MilitaryServiceStatus getStatus(){
             return MilitaryServiceStatus.findByName(statusName);
         }
-    }
 
-    @Setter
-    @NoArgsConstructor
-    @Getter
-    public static class Response {
+        public void print(){
 
-        String temp;
-
-        public Response(String temp){
-            this.temp = temp;
         }
     }
 }

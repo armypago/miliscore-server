@@ -33,9 +33,10 @@ public class WithUserSecurityContextFactory implements
 
     private User createUser(WithUser withUser){
         User user = User.builder()
-                .name(withUser.name())
-                .email(withUser.email())
-                .status(withUser.status()).build();
+//                .name(withUser.name())
+//                .email(withUser.email())
+//                .status(withUser.status())
+                .build();
         if(withUser.roles().length > 0){
             String role = "ROLE_"+withUser.roles()[0];
             if(role.equals(Role.MANAGER.getKey())){

@@ -29,7 +29,7 @@ public class UserService {
         Optional<Branch> branch = branchRepository.findById(request.getBranchId());
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         if(education.isPresent() && branch.isPresent()){
-            user.initialize(request.getName(), request.getEmail(), request.getStatus(),
+            user.initialize(request.getName(), request.getStatus(),
                     education.get(), branch.get(), request.getMajor());
         }
         return user;
@@ -46,14 +46,14 @@ public class UserService {
         return form;
     }
 
-    public User loadUser(String token){
-        return userRepository.findByToken(token)
-                .orElseGet(() -> createUser(token));
+    public User loadUser(String email){
+        return userRepository.findByEmail(email)
+                .orElseGet(() -> createUser(email));
     }
 
-    private User createUser(String token){
+    private User createUser(String email){
         User user = User.builder()
-                .token(token).build();
+                .email(email).build();
         return userRepository.save(user);
     }
 

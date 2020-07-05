@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.armypago.miliscoreserver.user.UserApi.USER_URL;
 
@@ -24,12 +26,12 @@ public class UserApi {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final UserService userService;
+    private final UserQueryRepository userQueryRepository;
     private final UserRepository userRepository;
-    private final EducationRepository educationRepository;
 
     @PostMapping
-    public ResponseEntity<?> login(@RequestBody String token){
-        User user = userService.loadUser(token);
+    public ResponseEntity<?> login(@RequestBody UserLogin.Check check){
+        User user = userService.loadUser(check.getEmail());
 
         if(!user.hasInitialized()){
             UserCreate.Form form = userService.loadForm(user.getId());
@@ -42,6 +44,7 @@ public class UserApi {
     @PostMapping("/{id}")
     public ResponseEntity<?> register(@PathVariable Long id,
                                       @RequestBody UserCreate.Request request){
+
         User user = userService.initiateUser(id, request);
         UserLogin.Session session = new UserLogin.Session(id, user.getName());
         return ResponseEntity.status(HttpStatus.OK).body(session);
@@ -49,13 +52,23 @@ public class UserApi {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable Long id){
-        Optional<User> user = userRepository.findById(id);
-        if(!user.isPresent()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("사용자를 찾을 수 없습니다.");
-        }
-        UserDetail.Response response = new UserDetail.Response(user.get());
+        User user = userQueryRepository.findById(id);
+        UserDetail.Response response = new UserDetail.Response(user);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getList(){
+        List<UserDetail.Response> response = userQueryRepository.findAll().stream()
+                .map(UserDetail.Response::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        userRepository.findById(id).ifPresent(userRepository::delete);
+        return ResponseEntity.status(HttpStatus.OK).body(id);
     }
 
 //    @PostMapping("/{id}")

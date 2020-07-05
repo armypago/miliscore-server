@@ -11,6 +11,15 @@ public class UserLogin {
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
+    public static class Check {
+
+        private String email;
+    }
+
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
     public static class Session {
 
         private Long id;

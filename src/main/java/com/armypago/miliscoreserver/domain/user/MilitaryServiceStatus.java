@@ -37,6 +37,6 @@ public enum MilitaryServiceStatus {
 
     public static List<String> getList(){
         return Stream.of(MilitaryServiceStatus.values())
-                .map(Enum::name).collect(toList());
+                .map(MilitaryServiceStatus::getName).collect(toList());
     }
 }
