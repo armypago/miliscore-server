@@ -22,6 +22,6 @@ public class BranchService {
         }
         Branch branch = Branch.builder()
                 .category(category.get()).name(name).description(description).build();
-        return new BranchDetail.Response(branchRepository.save(branch), null);
+        return new BranchDetail.Response(branchRepository.save(branch), null, null);
     }
 }

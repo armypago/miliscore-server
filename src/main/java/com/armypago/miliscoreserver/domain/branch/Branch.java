@@ -27,7 +27,7 @@ public class Branch extends BaseTimeEntity {
     private Category category;
 
     @OneToMany(mappedBy = "branch")
-    private List<Evaluation> evaluations = new ArrayList();
+    private List<Evaluation> evaluations = new ArrayList<>();
 
     private String description;
 

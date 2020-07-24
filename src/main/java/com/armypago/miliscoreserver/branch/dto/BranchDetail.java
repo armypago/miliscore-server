@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +34,9 @@ public class BranchDetail {
         private RadarChart score;
         private CategorySimple category;
         private List<EvaluationSimple> evaluations = new ArrayList<>();
+        private List<LocalDate> recruits = new ArrayList<>();
 
-        public Response(Branch branch, RadarChart score){
+        public Response(Branch branch, RadarChart score, List<LocalDate> recruits){
             id = branch.getId();
             name = branch.getName();
 //            modifiedDate = branch.getModifiedDate();
@@ -42,6 +44,9 @@ public class BranchDetail {
                     .map(EvaluationSimple::new).collect(toList());
             this.score = score;
             category = new CategorySimple(branch.getCategory());
+            if(recruits != null){
+                this.recruits = recruits;
+            }
         }
     }
 
